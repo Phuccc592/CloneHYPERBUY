@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voucher Của Tôi - HyperBuy</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header>
+  <nav id="main-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">HyperBuy</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Trang Chủ</a></li>
+        <li><a href="my-voucher.html" class="active">Voucher Của Tôi</a></li>
+        <li><a href="profile.html">Hồ Sơ</a></li>
+        <li><a href="cart.html">Giỏ Hàng</a></li>
+        <li><a href="#" id="nav-logout">Đăng Xuất</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <h1>🎁 Voucher Của Tôi</h1>
+  <div id="my-voucher-list" class="voucher-grid"></div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; <span id="current-year"></span> HyperBuy.</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    if (!isLoggedIn()) {
+      alert("Vui lòng đăng nhập để xem voucher của bạn!");
+      window.location.href = "login.html";
+      return;
+    }
+    await loadMyVouchers();
+  });
+</script>
+</body>
+</html>

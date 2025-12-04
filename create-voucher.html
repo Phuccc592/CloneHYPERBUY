@@ -1,0 +1,17 @@
+<h2>Tạo Voucher Mới</h2>
+<form id="createVoucherForm">
+  <input name="code" placeholder="Mã voucher" required><br>
+  <input name="discountValue" type="number" step="0.01" placeholder="Giá trị giảm" required><br>
+  <select name="discountType">
+    <option value="PERCENT">Phần trăm</option>
+    <option value="AMOUNT">Số tiền</option>
+  </select><br>
+  <input name="quantity" type="number" placeholder="Số lượng"><br>
+  <input name="startDate" type="datetime-local" required><br>
+  <input name="endDate" type="datetime-local" required><br>
+  <select name="status"><option value="ACTIVE">ACTIVE</option><option value="INACTIVE">INACTIVE</option></select><br>
+  <button type="submit">Tạo</button>
+</form>
+<p id="voucher-success-message" class="success-message"></p>
+<p id="voucher-error-message" class="error-message"></p>
+<script>document.getElementById('createVoucherForm').addEventListener('submit', handleCreateVoucher);</script>

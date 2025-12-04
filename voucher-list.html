@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danh Sách Voucher - HyperBuy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* 🎨 Giao diện thẻ voucher */
+    .voucher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .voucher-card {
+      background: var(--light-gray-background, #f8f8f8);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .voucher-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .voucher-card.active { border-left: 6px solid #28a745; background: #e8f7ee; }
+    .voucher-card.inactive { border-left: 6px solid #999; background: #f2f2f2; }
+
+    .voucher-code {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .voucher-discount {
+      font-size: 1.2em;
+      color: #007bff;
+      margin: 6px 0;
+    }
+
+    .voucher-info {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .voucher-status {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .voucher-status.active { color: #28a745; }
+    .voucher-status.inactive { color: #888; }
+
+    @media (max-width: 600px) {
+      .voucher-card {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <nav id="main-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">HyperBuy</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Trang Chủ</a></li>
+        <li><a href="voucher-list.html" class="active">Voucher</a></li>
+        <li><a href="my-voucher.html">Voucher Của Tôi</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <h1>🎟️ Danh Sách Voucher Đang Hoạt Động</h1>
+  <div id="voucher-list-container"></div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; <span id="current-year"></span> HyperBuy.</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const container = document.getElementById("voucher-list-container");
+  container.innerHTML = "<p>⏳ Đang tải voucher...</p>";
+
+  const result = await callApi(VOUCHER_API_BASE_URL, '/vouchers', 'GET');
+  if (result.ok && Array.isArray(result.data)) {
+    if (result.data.length === 0) {
+      container.innerHTML = "<p>Hiện chưa có voucher nào.</p>";
+      return;
+    }
+
+    let html = '<div class="voucher-grid">';
+    result.data.forEach(v => {
+      const activeClass = v.status === "ACTIVE" ? "active" : "inactive";
+      html += `
+        <div class="voucher-card ${activeClass}">
+          <div class="voucher-code">${v.code}</div>
+          <div class="voucher-discount">Giảm: ${v.discountValue}${v.discountType === 'PERCENT' ? '%' : '₫'}</div>
+          <div class="voucher-info">Số lượng: ${v.quantity ?? '-'}</div>
+          <div class="voucher-info">Hết hạn: ${v.endDate ?? 'Không xác định'}</div>
+          <div class="voucher-status ${activeClass}">${v.status}</div>
+        </div>
+      `;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } else {
+    container.innerHTML = `<p class="error-message">Lỗi tải voucher: ${result.data?.message || result.error}</p>`;
+  }
+});
+</script>
+</body>
+</html>

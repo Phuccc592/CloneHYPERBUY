@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HyperBuy - Đơn hàng cửa hàng</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- ===== HEADER (giống index) ===== -->
+  <header class="main-header">
+    <nav id="main-navbar" class="nav-elevated">
+      <div class="container nav-container">
+        <div class="header-left">
+          <a href="index.html" class="nav-brand">⚡ HyperBuy</a>
+        </div>
+
+        <ul id="main-nav" class="nav-links">
+          <li><a href="index.html" id="nav-home" class="nav-link">Trang Chủ</a></li>
+          <li><a href="products.html" id="nav-products" class="nav-link">Sản Phẩm</a></li>
+          <li id="nav-profile" style="display:none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
+          <li id="nav-my-orders" style="display:none;"><a href="my-orders.html" class="nav-link">Đơn Hàng</a></li>
+          <li><a href="minigame.html" class="nav-link">MiniGame</a></li>
+          <li id="nav-admin-dashboard-li" style="display:none;"><a href="admin.html" class="nav-link">Quản Trị</a></li>
+          <li id="nav-cart-link-li">
+            <a href="cart.html" class="nav-link">
+              <i class="fas fa-shopping-cart"></i> Giỏ Hàng
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="home-layout container">
+    <!-- LEFT: Danh sách đơn hàng -->
+    <section class="home-main">
+      <section id="seller-orders-section" class="card-section">
+        <h2>
+          <i class="fas fa-store"></i>
+          Đơn hàng của cửa hàng
+        </h2>
+        <p class="section-subtitle">
+          Xem, lọc và cập nhật trạng thái các đơn hàng thuộc cửa hàng của bạn.
+        </p>
+
+        <!-- Bộ lọc -->
+        <div class="seller-filters-card">
+          <div class="seller-filters-row">
+            <div class="filter-item">
+              <label for="seller-filter-status">Trạng thái:</label>
+              <select id="seller-filter-status">
+                <option value="ALL">Tất cả</option>
+                <option value="PENDING">PENDING</option>
+                <option value="CONFIRMED">CONFIRMED</option>
+                <option value="DELIVERED">DELIVERED</option>
+                <option value="CANCELLED">CANCELLED</option>
+              </select>
+            </div>
+
+            <div class="filter-item">
+              <label for="seller-filter-order-id">Tìm theo ID đơn:</label>
+              <input type="number" id="seller-filter-order-id" placeholder="VD: 217" />
+            </div>
+
+            <div class="filter-item filter-buttons">
+              <button id="btn-seller-apply-filters" class="btn btn-primary">
+                <i class="fas fa-filter"></i> Áp dụng
+              </button>
+              <button id="btn-seller-reset-filters" class="btn btn-secondary">
+                <i class="fas fa-eraser"></i> Xoá lọc
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảng đơn hàng -->
+        <div class="seller-orders-table-wrapper">
+          <table id="seller-orders-table" class="basic-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ngày tạo</th>
+                <th>Khách hàng</th>
+                <th>Số sản phẩm</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JS sẽ render -->
+              <tr>
+                <td colspan="7" style="text-align:center;">Đang tải dữ liệu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Thông báo nhỏ -->
+        <p class="note-text">
+          * Chỉ tài khoản <strong>SELLER</strong> mới thấy và cập nhật được danh sách này.
+        </p>
+      </section>
+    </section>
+
+    <!-- RIGHT: Tóm tắt doanh thu đơn giản -->
+    <aside class="category-sidebar-right" id="seller-sidebar-summary">
+      <h3><i class="fas fa-chart-line"></i> Tóm tắt đơn hàng</h3>
+      <div id="seller-orders-summary">
+        <p>Đơn PENDING: <span id="summary-pending">0</span></p>
+        <p>Đơn CONFIRMED: <span id="summary-confirmed">0</span></p>
+        <p>Đơn DELIVERED: <span id="summary-delivered">0</span></p>
+        <p>Tổng doanh thu (DELIVERED): <br>
+          <strong id="summary-total-revenue">0 đ</strong>
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="current-year"></span> HyperBuy. Mọi quyền được bảo lưu.</p>
+    </div>
+  </footer>
+
+  <!-- ===== JS CHUNG ===== -->
+  <script src="js/main.js"></script>
+
+  <!-- ===== JS RIÊNG CHO SELLER ORDERS ===== -->
+  <script>
+    // Biến global để main.js có thể dùng khi reload
+    let currentSellerFilterStatus = null;
+
+    // ==============================
+    // Helper: format tiền VND
+    // ==============================
+    function formatCurrencyVND(value) {
+      const num = Number(value) || 0;
+      return num.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    }
+
+    // ==============================
+    // Render bảng đơn hàng cho seller
+    // ==============================
+    function renderSellerOrdersTable(orders) {
+      const tbody = document.querySelector('#seller-orders-table tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML =
+          '<tr><td colspan="7" style="text-align:center;">Không có đơn hàng nào.</td></tr>';
+        updateSellerSummary([]);
+        return;
+      }
+
+      let summaryPending = 0;
+      let summaryConfirmed = 0;
+      let summaryDelivered = 0;
+      let summaryRevenue = 0;
+
+      orders.forEach(order => {
+        const tr = document.createElement('tr');
+
+        const createdAt = order.orderDate || order.createdAt || '';
+        const customer = order.username || order.userId || 'N/A';
+        const itemCount = Array.isArray(order.items) ? order.items.length : (order.itemCount || 0);
+        const totalAmount = order.finalAmount ?? order.totalAmount ?? 0;
+        const status = order.status || 'PENDING';
+
+        if (status === 'PENDING') summaryPending++;
+        if (status === 'CONFIRMED') summaryConfirmed++;
+        if (status === 'DELIVERED') {
+          summaryDelivered++;
+          summaryRevenue += Number(totalAmount) || 0;
+        }
+
+        const canConfirm = status === 'PENDING';
+        const canDeliver = status === 'CONFIRMED';
+
+        tr.innerHTML = `
+          <td>${order.id}</td>
+          <td>${createdAt ? new Date(createdAt).toLocaleString('vi-VN') : ''}</td>
+          <td>${customer}</td>
+          <td>${itemCount}</td>
+          <td>${formatCurrencyVND(totalAmount)}</td>
+          <td><span class="badge-status badge-${status.toLowerCase()}">${status}</span></td>
+          <td>
+            ${canConfirm ? `
+              <button class="btn btn-sm btn-primary seller-btn-update-status"
+                      data-order-id="${order.id}"
+                      data-status="CONFIRMED">
+                Xác nhận
+              </button>` : ''}
+            ${canDeliver ? `
+              <button class="btn btn-sm btn-success seller-btn-update-status"
+                      style="margin-top:4px;"
+                      data-order-id="${order.id}"
+                      data-status="DELIVERED">
+                Đã giao
+              </button>` : ''}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      updateSellerSummary({
+        pending: summaryPending,
+        confirmed: summaryConfirmed,
+        delivered: summaryDelivered,
+        revenue: summaryRevenue
+      });
+    }
+
+    // ==============================
+    // Cập nhật box tóm tắt bên phải
+    // ==============================
+    function updateSellerSummary(summary) {
+      const pendingEl   = document.getElementById('summary-pending');
+      const confirmedEl = document.getElementById('summary-confirmed');
+      const deliveredEl = document.getElementById('summary-delivered');
+      const revenueEl   = document.getElementById('summary-total-revenue');
+
+      if (!summary || typeof summary === 'undefined') {
+        if (pendingEl)   pendingEl.textContent   = '0';
+        if (confirmedEl) confirmedEl.textContent = '0';
+        if (deliveredEl) deliveredEl.textContent = '0';
+        if (revenueEl)   revenueEl.textContent   = '0 đ';
+        return;
+      }
+
+      if (pendingEl)   pendingEl.textContent   = summary.pending   ?? summary.PENDING   ?? 0;
+      if (confirmedEl) confirmedEl.textContent = summary.confirmed ?? summary.CONFIRMED ?? 0;
+      if (deliveredEl) deliveredEl.textContent = summary.delivered ?? summary.DELIVERED ?? 0;
+      if (revenueEl)   revenueEl.textContent   = formatCurrencyVND(summary.revenue ?? 0);
+    }
+
+    // ==============================
+    // Gọi API lấy danh sách đơn hàng seller
+    // GET /api/v1/orders/seller?status=PENDING
+    // hoặc /api/v1/orders/seller/{orderId}
+    // ==============================
+    async function loadSellerOrders() {
+      if (!isLoggedIn() || getUserRole() !== 'SELLER') {
+        renderSellerOrdersTable([]);
+        alert('Bạn cần đăng nhập bằng tài khoản SELLER để xem trang này.');
+        return;
+      }
+
+      const statusSelect = document.getElementById('seller-filter-status');
+      const orderIdInput = document.getElementById('seller-filter-order-id');
+
+      const statusValue  = statusSelect ? statusSelect.value : 'ALL';
+      const orderIdValue = orderIdInput ? orderIdInput.value.trim() : '';
+
+      // lưu lại cho main.js dùng khi reload
+      currentSellerFilterStatus = statusValue;
+
+      let endpoint = '';
+
+      if (orderIdValue) {
+        endpoint = `/orders/seller/${encodeURIComponent(orderIdValue)}`;
+      } else {
+        const query = (statusValue && statusValue !== 'ALL')
+          ? `?status=${encodeURIComponent(statusValue)}`
+          : '';
+        endpoint = `/orders/seller${query}`;
+      }
+
+      const result = await callApi(
+        ORDER_API_BASE_URL,
+        endpoint,
+        'GET',
+        null,
+        true
+      );
+
+      if (!result.ok || !result.data) {
+        console.error('loadSellerOrders error:', result);
+        renderSellerOrdersTable([]);
+        alert(result.data?.message || result.error || 'Không thể tải danh sách đơn hàng.');
+        return;
+      }
+
+      let orders = [];
+      const d = result.data;
+
+      if (Array.isArray(d)) {
+        orders = d;
+      } else if (Array.isArray(d.result)) {
+        orders = d.result;
+      } else if (Array.isArray(d.content)) {
+        orders = d.content;
+      } else if (d.id) {
+        orders = [d];
+      }
+
+      renderSellerOrdersTable(orders);
+    }
+
+    // ==============================
+    // Event listeners
+    // ==============================
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Hàm chung từ main.js
+      if (typeof updateNav === 'function') updateNav();
+      if (typeof fetchCartData === 'function') fetchCartData();
+      if (typeof setActiveNavLink === 'function') setActiveNavLink();
+
+      const yearEl = document.getElementById('current-year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      // Lần đầu load
+      await loadSellerOrders();
+
+      // Áp dụng lọc
+      const applyBtn = document.getElementById('btn-seller-apply-filters');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', async () => {
+          await loadSellerOrders();
+        });
+      }
+
+      // Reset lọc
+      const resetBtn = document.getElementById('btn-seller-reset-filters');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', async () => {
+          const statusSelect = document.getElementById('seller-filter-status');
+          const orderIdInput = document.getElementById('seller-filter-order-id');
+          if (statusSelect) statusSelect.value = 'ALL';
+          if (orderIdInput) orderIdInput.value = '';
+          await loadSellerOrders();
+        });
+      }
+    });
+
+    // ⚠️ KHÔNG cần viết lại sellerUpdateOrderStatus ở đây
+    // vì đã có trong main.js:
+    //  - sellerUpdateOrderStatus(orderId, newStatus)  → PATCH /orders/{id}/status?status=...
+    //  - document.addEventListener('click', ...) handle .seller-btn-update-status
+  </script>
+</body>
+</html>
+

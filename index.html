@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HyperBuy - Trang Chủ</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="main-header">
+    <nav id="main-navbar" class="nav-elevated">
+      <div class="container nav-container">
+        <div class="header-left">
+          <a href="index.html" class="nav-brand">⚡ HyperBuy</a>
+        </div>
+
+        <ul id="main-nav" class="nav-links">
+          <li><a href="index.html" id="nav-home" class="nav-link active">Trang Chủ</a></li>
+          <li><a href="products.html" id="nav-products" class="nav-link">Sản Phẩm</a></li>
+          <li id="nav-profile" style="display:none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
+          <li id="nav-my-orders" style="display:none;"><a href="my-orders.html" class="nav-link">Đơn Hàng</a></li>
+          <li><a href="minigame.html" class="nav-link">MiniGame</a></li>
+          <li id="nav-admin-dashboard-li" style="display:none;"><a href="admin.html" class="nav-link">Quản Trị</a></li>
+          <li id="nav-cart-link-li">
+            <a href="cart.html" class="nav-link">
+              <i class="fas fa-shopping-cart"></i> Giỏ Hàng
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="home-layout container">
+    <!-- LEFT: Featured Products -->
+    <section class="home-main">
+      <section id="featured-products">
+        <h2><i class="fas fa-star"></i> Sản phẩm nổi bật</h2>
+
+        <!-- 🔥 Khu vực hiển thị sản phẩm gợi ý AI (guest hoặc user) -->
+        <div id="guest-recommend-products" class="product-grid"></div>
+
+        <!-- Sản phẩm thường trên trang chủ -->
+        <div class="product-grid" id="product-grid-home">
+          <p>Đang tải sản phẩm...</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- RIGHT: Category List -->
+    <aside class="category-sidebar-right" id="category-sidebar-fixed">
+      <h3><i class="fas fa-list"></i> Danh Mục Sản Phẩm</h3>
+      <ul id="right-category-list">
+        <li>Đang tải danh mục...</li>
+      </ul>
+    </aside>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="current-year"></span> HyperBuy. Mọi quyền được bảo lưu.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Trang chủ: load khuyến nghị + sản phẩm + danh mục
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("authToken");
+
+      // ===== 1. GỢI Ý SẢN PHẨM (AI) =====
+      // Hàm này đã dùng fetchUserRecommendations / fetchGuestRecommendations ở main.js
+      await loadHomeRecommendations(12);
+
+      // ===== 2. SẢN PHẨM TRANG CHỦ (GRID BÊN DƯỚI) =====
+      if (document.getElementById("product-grid-home")) {
+        // Hàm loadProducts đã có trong main.js
+        loadProducts("product-grid-home", { size: 8 });
+      }
+
+      // ===== 3. DANH MỤC BÊN PHẢI =====
+      const ul = document.getElementById("right-category-list");
+      try {
+        const categoriesResult = await callApi(
+          PRODUCT_API_BASE_URL,
+          "/categories",
+          "GET",
+          null,
+          !!token   // true nếu có token, false nếu không
+        );
+
+        if (categoriesResult.ok && Array.isArray(categoriesResult.data)) {
+          ul.innerHTML = "";
+          categoriesResult.data.forEach(c => {
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="products.html?category=${c.id}">${c.name}</a>`;
+            ul.appendChild(li);
+          });
+        } else {
+          ul.innerHTML = "<li>Không có danh mục nào.</li>";
+        }
+      } catch (err) {
+        console.error("❌ Lỗi tải danh mục:", err);
+        ul.innerHTML = "<li>Không thể tải danh mục.</li>";
+      }
+    });
+  </script>
+</body>
+</html>

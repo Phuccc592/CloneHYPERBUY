@@ -1,0 +1,9 @@
+<h2>Gửi Voucher cho User</h2>
+<form id="issueVoucherForm">
+  <input name="userId" placeholder="User ID" required><br>
+  <input name="voucherCode" placeholder="Mã voucher" required><br>
+  <button type="submit">Gửi Voucher</button>
+</form>
+<p id="issue-success-message" class="success-message"></p>
+<p id="issue-error-message" class="error-message"></p>
+<script>document.getElementById('issueVoucherForm').addEventListener('submit', handleIssueVoucher);</script>

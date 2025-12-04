@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HyperBuy - MiniGame</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- HEADER giống các trang khác -->
+  <header class="main-header">
+    <nav id="main-navbar" class="nav-elevated">
+      <div class="container nav-container">
+        <div class="header-left">
+          <a href="index.html" class="nav-brand">⚡ HyperBuy</a>
+        </div>
+
+        <ul id="main-nav" class="nav-links">
+          <li><a href="index.html" class="nav-link">Trang Chủ</a></li>
+          <li><a href="products.html" class="nav-link">Sản Phẩm</a></li>
+          <li id="nav-profile" style="display:none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
+          <li id="nav-my-orders" style="display:none;"><a href="my-orders.html" class="nav-link">Đơn Hàng</a></li>
+          <li id="nav-admin-dashboard-li" style="display:none;"><a href="admin.html" class="nav-link">Quản Trị</a></li>
+          <li><a href="minigame.html" class="nav-link active">MiniGame</a></li>
+          <li id="nav-cart-link-li">
+            <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Giỏ Hàng</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container" id="minigame-page" style="margin-top: 24px;">
+    <h1>MiniGame HyperBuy</h1>
+    <p>Chơi game để nhận điểm thưởng và voucher 😎</p>
+
+    <!-- DAILY REWARD -->
+    <section class="card" style="margin-top: 16px; padding: 16px;">
+      <h2><i class="fa-solid fa-calendar-check"></i> Điểm danh hàng ngày</h2>
+      <p>Mỗi ngày bạn có thể nhận thưởng 1 lần khi đăng nhập.</p>
+      <button id="btn-daily-reward" class="btn btn-primary">Nhận điểm đăng nhập hôm nay</button>
+    </section>
+
+    <!-- SPIN WHEEL -->
+    <section class="card" style="margin-top: 16px; padding: 16px;">
+      <h2><i class="fa-solid fa-compact-disc"></i> Vòng quay may mắn</h2>
+      <p>Quay để nhận điểm hoặc voucher ngẫu nhiên.</p>
+      <button id="btn-spin-wheel" class="btn btn-success">Quay ngay</button>
+    </section>
+
+    <!-- CARD FLIP -->
+    <section class="card" style="margin-top: 16px; padding: 16px;">
+      <h2><i class="fa-solid fa-clone"></i> Lật thẻ nhận quà</h2>
+      <p>Chọn 1 trong 6 thẻ để nhận phần thưởng bí mật.</p>
+    <div class="card-choice-group">
+    <button class="btn btn-primary btn-card-choice" data-choice="1">Thẻ 1</button>
+    <button class="btn btn-primary btn-card-choice" data-choice="2">Thẻ 2</button>
+    <button class="btn btn-primary btn-card-choice" data-choice="3">Thẻ 3</button>
+    <button class="btn btn-primary btn-card-choice" data-choice="4">Thẻ 4</button>
+    <button class="btn btn-primary btn-card-choice" data-choice="5">Thẻ 5</button>
+    <button class="btn btn-primary btn-card-choice" data-choice="6">Thẻ 6</button>
+  </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="card" style="margin-top: 16px; padding: 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử nhận quà</h2>
+        <button id="btn-reload-history" class="btn btn-secondary btn-sm">Tải lại</button>
+      </div>
+
+      <div class="table-wrapper" style="margin-top: 12px; overflow-x:auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Loại game</th>
+              <th>Phần thưởng</th>
+              <th>Thời gian</th>
+            </tr>
+          </thead>
+          <tbody id="minigame-history-body">
+            <tr><td colspan="4">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <section class="card" style="margin-top: 16px; padding: 16px;">
+      <section class="card" style="margin-top: 16px; padding: 16px;">
+        <h2><i class="fa-solid fa-ticket"></i> Đổi điểm lấy Voucher</h2>
+
+        <p>Điểm hiện tại: <b id="minigame-current-points">0</b></p>
+        <p style="margin-top: 4px; color:#666;">
+          Chọn một voucher bên dưới để đổi bằng điểm của bạn.
+        </p>
+
+        <!-- JS sẽ render danh sách voucher tại đây -->
+        <div id="minigame-voucher-list" style="margin-top: 12px;">
+          <!-- Ví dụ:
+          <div class="minigame-voucher-row">...</div>
+          -->
+        </div>
+      </section>
+</section>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="current-year"></span> HyperBuy. Mọi quyền được bảo lưu.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

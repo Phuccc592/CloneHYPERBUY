@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Thông Báo - HyperBuy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-left">
+                <a href="" class="logo">⚡ HyperBuy</a>
+            </div>
+            <nav id="main-nav">
+    <a href="admin.html" id="nav-admin-dashboard" style="display:none;">Trang Quản Trị</a>
+
+
+<li class="nav-item nav-notification-container" id="nav-notification-bell" style="display: none; position: relative;">
+    <a href="#" id="notification-bell-link" class="nav-link" title="Thông báo">
+        <i class="fas fa-bell"></i>
+        <span id="notification-count" class="notification-badge"></span>
+    </a>
+    <div class="dropdown-menu-notif" id="notification-dropdown"> <div class="notification-dropdown-header">Thông báo</div>
+        <ul id="notification-list-items" class="notification-list">
+            <li><a class="dropdown-item-notif" href="#">Không có thông báo nào.</a></li>
+        </ul>
+        <div class="notification-dropdown-footer">
+            <a href="notifications.html">Xem tất cả thông báo</a>
+        </div>
+    </div>
+</li>
+    <a href="login.html" id="nav-login">Đăng Nhập</a>
+    <a href="register.html" id="nav-register">Đăng Ký</a>
+    <a href="#" id="nav-logout" style="display:none;">Đăng Xuất</a>
+</nav>
+        </div>
+    </header>
+    <div id="sidebar-overlay" style="display:none;"></div>
+
+    <main class="container">
+        <section class="form-container">
+            <h2>Gửi Thông Báo (Admin)</h2>
+            <form id="sendNotificationForm">
+                <div class="form-group">
+                    <label for="notification-userid">User ID (Bắt buộc - Dựa trên Postman):</label>
+                    <input type="text" id="notification-userid" name="userId" required>
+                    <small>Bạn có thể lấy User ID từ cơ sở dữ liệu hoặc trang quản lý người dùng (nếu có).</small>
+                </div>
+                <div class="form-group">
+                    <label for="notification-message">Nội dung thông báo:</label>
+                    <textarea id="notification-message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi Thông Báo</button>
+                <p id="send-notification-success-message" class="success-message" style="display:none;"></p>
+                <p id="send-notification-error-message" class="error-message" style="display:none;"></p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container"><p>&copy; <span id="current-year"></span> HyperBuy.</p></div>
+    </footer>
+
+    <div id="floating-cart-icon" style="display: none;">
+        <a href="cart.html"><img src="images/cart-icon.png" alt="Giỏ hàng" /> <span id="floating-cart-count">0</span></a>
+    </div>
+    <script src="js/main.js"></script><script>
+document.addEventListener("DOMContentLoaded", async () => {
+    // Kiểm tra đăng nhập
+    if (!isLoggedIn()) {
+        alert("Bạn cần đăng nhập trước khi thêm sản phẩm.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Chỉ ADMIN hoặc SELLER được phép thêm sản phẩm
+    const role = getUserRole();
+    if (role !== "ADMIN" && role !== "SELLER") {
+        alert("Chỉ người bán hoặc quản trị viên mới có quyền thêm sản phẩm.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Gọi hàm tải danh mục
+    await loadCategoriesAndBuildMap("product-category-id");
+
+    // Gắn sự kiện gửi form
+    const form = document.getElementById("addProductForm");
+    if (form) {
+        form.addEventListener("submit", handleAddProduct);
+    }
+
+    // Gắn sự kiện xem trước ảnh
+    setupImagePreview("product-image-file", "product-image-preview", "add-file-chosen-text");
+});
+</script>
+</body>
+</html>

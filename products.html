@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HyperBuy - Sản phẩm</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="main-header">
+    <nav id="main-navbar" class="nav-elevated">
+      <div class="container nav-container">
+        <div class="header-left">
+          <a href="index.html" class="nav-brand">⚡ HyperBuy</a>
+        </div>
+
+        <ul id="main-nav" class="nav-links">
+          <li><a href="index.html" id="nav-home" class="nav-link">Trang Chủ</a></li>
+          <li><a href="products.html" id="nav-products" class="nav-link active">Sản Phẩm</a></li>
+          <li><a href="my-orders.html" id="nav-my-orders" class="nav-link">Đơn Hàng</a></li>
+          <li><a href="profile.html" id="nav-profile" class="nav-link">Hồ Sơ</a></li>
+          <li id="nav-cart-link-li">
+            <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Giỏ Hàng</a>
+          </li>
+          <li><a href="minigame.html" class="nav-link">MiniGame</a></li>
+          <!-- 🔔 Dropdown Thông báo -->
+          <li class="nav-notification">
+            <div class="dropdown">
+              <button class="dropbtn">
+                <i class="fas fa-bell"></i>
+              </button>
+              <div class="dropdown-content" id="notification-dropdown">
+                <p>Không có thông báo nào.</p>
+                <a href="notifications.html">Xem tất cả thông báo</a>
+              </div>
+            </div>
+          </li>
+
+          <li><a href="#" id="nav-logout" class="nav-link">Đăng Xuất</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="container product-page">
+    <section class="filter-section">
+      <h2>🔍 Tìm kiếm & Lọc Sản phẩm</h2>
+      <form id="product-filter-form">
+        <label for="name">Tên sản phẩm:</label>
+        <input type="text" id="name" name="name" placeholder="Nhập từ khóa..." />
+
+        <label for="category">Danh mục:</label>
+        <select id="category" name="category">
+          <option value="">-- Tất cả danh mục --</option>
+        </select>
+
+        <label>Khoảng giá (VND):</label>
+        <div class="price-filter">
+          <input type="number" id="minPrice" placeholder="Từ" />
+          <span>-</span>
+          <input type="number" id="maxPrice" placeholder="Đến" />
+        </div>
+
+        <label for="sort">Sắp xếp:</label>
+        <select id="sort">
+          <option value="">Mặc định</option>
+          <option value="priceAsc">Giá tăng dần</option>
+          <option value="priceDesc">Giá giảm dần</option>
+        </select>
+
+        <div class="filter-buttons">
+          <button type="submit" class="btn-primary">Lọc Sản Phẩm</button>
+          <button type="reset" class="btn-secondary">Reset Bộ Lọc</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="product-results">
+      <h2>Tất cả sản phẩm</h2>
+      <div id="product-list" class="product-grid">
+        <p>Đang tải sản phẩm...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="current-year"></span> HyperBuy. Mọi quyền được bảo lưu.</p>
+    </div>
+  </footer>
+
+<script src="js/main.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Load danh mục vào select #category
+    await loadCategoriesAndBuildMap("category");
+
+    // 2. Lấy tham số trên URL
+    const urlParams       = new URLSearchParams(window.location.search);
+    const nameFromUrl     = urlParams.get("name") || "";
+    // 👉 HỖ TRỢ CẢ ?category= VÀ ?categoryId=
+    const categoryFromUrl = urlParams.get("category") || urlParams.get("categoryId") || "";
+    const minFromUrl      = urlParams.get("minPrice") || "";
+    const maxFromUrl      = urlParams.get("maxPrice") || "";
+    const sortFromUrl     = urlParams.get("sort") || "";
+
+    const nameInput      = document.getElementById("name");
+    const categorySelect = document.getElementById("category");
+    const minPriceInput  = document.getElementById("minPrice");
+    const maxPriceInput  = document.getElementById("maxPrice");
+    const sortSelect     = document.getElementById("sort");
+
+    if (nameInput)      nameInput.value      = nameFromUrl;
+    if (categorySelect && categoryFromUrl) categorySelect.value = categoryFromUrl;
+    if (minPriceInput)  minPriceInput.value  = minFromUrl;
+    if (maxPriceInput)  maxPriceInput.value  = maxFromUrl;
+    if (sortSelect && sortFromUrl) sortSelect.value = sortFromUrl;
+
+    // 3. Submit form lọc
+    const filterForm = document.getElementById("product-filter-form");
+    if (filterForm) {
+      filterForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await fetchProductsByFilters(0);
+      });
+
+      filterForm.addEventListener("reset", async (e) => {
+        e.preventDefault();
+        window.history.replaceState({}, "", window.location.pathname);
+        setTimeout(() => fetchProductsByFilters(0), 0);
+      });
+    }
+
+    // 4. Lần đầu vào trang ⇒ load theo bộ lọc (hoặc theo category từ URL)
+    await fetchProductsByFilters(0);
+  });
+</script>
+</body>
+</html>

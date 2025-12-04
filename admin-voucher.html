@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Voucher - HyperBuy Admin</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header>
+  <nav id="main-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">HyperBuy</a>
+      <ul class="nav-links">
+        <li><a href="admin.html">Trang Quản Trị</a></li>
+        <li><a href="admin-voucher.html" class="active">Voucher</a></li>
+        <li><a href="#" id="admin-logout-btn">Đăng Xuất</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+
+  <h1>🎟️ Quản lý Voucher</h1>
+
+  <!-- Tạo Voucher -->
+  <section class="form-container">
+    <h2>Tạo Voucher Mới</h2>
+    <form id="createVoucherForm">
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label>Mã Voucher:</label>
+          <input name="code" required />
+        </div>
+        <div class="form-group form-group-half">
+          <label>Giá trị giảm:</label>
+          <input name="discountValue" type="number" step="0.01" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label>Loại giảm:</label>
+          <select name="discountType">
+            <option value="PERCENT">Phần trăm (%)</option>
+            <option value="AMOUNT">Số tiền (₫)</option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label>Số lượng:</label>
+          <input name="quantity" type="number" min="1" value="1" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label>Ngày bắt đầu:</label>
+          <input name="startDate" type="datetime-local" required />
+        </div>
+        <div class="form-group form-group-half">
+          <label>Ngày kết thúc:</label>
+          <input name="endDate" type="datetime-local" required />
+        </div>
+      </div>
+
+      <!-- 💎 Điểm cần để đổi voucher -->
+      <div class="form-group">
+        <label>Điểm cần để đổi (pointCost):</label>
+        <input name="pointCost" type="number" min="0" value="0" />
+      </div>
+
+      <div class="form-group">
+        <label>Trạng thái:</label>
+        <select name="status">
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
+        </select>
+      </div>
+
+
+      <button type="submit" class="btn btn-primary">Tạo Voucher</button>
+    </form>
+    <p id="voucher-success-message" class="success-message"></p>
+    <p id="voucher-error-message" class="error-message"></p>
+  </section>
+
+  <hr />
+
+  <!-- Gửi Voucher -->
+  <section class="form-container">
+    <h2>Gửi Voucher Cho Người Dùng</h2>
+    <form id="issueVoucherForm">
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label>ID Người Dùng:</label>
+          <input name="userId" placeholder="Nhập userId..." required />
+        </div>
+        <div class="form-group form-group-half">
+          <label>Mã Voucher:</label>
+          <input name="voucherCode" placeholder="Nhập mã voucher..." required />
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success">Gửi Voucher</button>
+    </form>
+    <p id="issue-success-message" class="success-message"></p>
+    <p id="issue-error-message" class="error-message"></p>
+  </section>
+
+  <hr />
+
+  <!-- Danh sách voucher -->
+  <section class="form-container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>📜 Danh sách voucher</h2>
+      <button id="btn-reload-voucher" class="btn btn-secondary">Tải lại</button>
+    </div>
+
+    <table class="table" style="margin-top: 12px;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Mã</th>
+          <th>Loại giảm</th>
+          <th>Giá trị</th>
+          <th>Số lượng</th>
+          <th>Đã dùng</th>
+          <th>Bắt đầu</th>
+          <th>Kết thúc</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody id="voucher-table-body">
+        <tr><td colspan="9">Đang tải...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<script src="js/main.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (getUserRole() !== "ADMIN") {
+    alert("Chỉ Admin mới được truy cập trang này!");
+    window.location.href = "index.html";
+    return;
+  }
+
+  document.getElementById("createVoucherForm").addEventListener("submit", handleCreateVoucher);
+  document.getElementById("issueVoucherForm").addEventListener("submit", handleIssueVoucher);
+  document.getElementById("btn-reload-voucher").addEventListener("click", loadVoucherList);
+
+  loadVoucherList();
+});
+</script>
+
+</body>
+</html>
