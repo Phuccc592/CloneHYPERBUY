@@ -11,7 +11,7 @@
 
 <body>
   <!-- ===== HEADER ===== -->
-  <header class="main-header">
+<header class="main-header">
     <nav id="main-navbar" class="nav-elevated">
       <div class="container nav-container">
         <div class="header-left">
@@ -20,31 +20,45 @@
 
         <ul id="main-nav" class="nav-links">
           <li><a href="index.html" id="nav-home" class="nav-link">Trang Chủ</a></li>
-          <li><a href="products.html" id="nav-products" class="nav-link active">Sản Phẩm</a></li>
-          <li><a href="my-orders.html" id="nav-my-orders" class="nav-link">Đơn Hàng</a></li>
-          <li><a href="profile.html" id="nav-profile" class="nav-link">Hồ Sơ</a></li>
-          <li id="nav-cart-link-li">
-            <a href="cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Giỏ Hàng</a>
-          </li>
+          <li><a href="products.html" id="nav-products" class="nav-link">Sản Phẩm</a></li>
+          
+          <li id="nav-profile" style="display:none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
+          <li id="nav-my-orders" style="display:none;"><a href="my-orders.html" class="nav-link nav-active">Đơn Hàng</a></li>
+
+          <!-- ⭐ QUẢN TRỊ (ID CHUẨN) -->
+          <li id="nav-admin-dashboard-li" style="display:none;"><a href="admin.html" class="nav-link">Quản Trị</a></li>
           <li><a href="minigame.html" class="nav-link">MiniGame</a></li>
-          <!-- 🔔 Dropdown Thông báo -->
-          <li class="nav-notification">
-            <div class="dropdown">
-              <button class="dropbtn">
-                <i class="fas fa-bell"></i>
-              </button>
-              <div class="dropdown-content" id="notification-dropdown">
-                <p>Không có thông báo nào.</p>
-                <a href="notifications.html">Xem tất cả thông báo</a>
-              </div>
-            </div>
+          <li id="nav-cart-link-li">
+            <a href="cart.html" class="nav-link">
+              <i class="fas fa-shopping-cart"></i> Giỏ Hàng
+              <span class="cart-item-count-nav" style="display:none;"></span>
+            </a>
           </li>
 
-          <li><a href="#" id="nav-logout" class="nav-link">Đăng Xuất</a></li>
+          <!-- 🔔 THÔNG BÁO -->
+          <li id="nav-notification-bell" style="display:none; position:relative;">
+              <a href="#" id="notification-bell-link" class="nav-link nav-link-bell">
+                  <i class="fas fa-bell"></i>
+                  <span id="notification-count" class="notification-badge" style="display:none;"></span>
+              </a>
+
+              <div id="notification-dropdown" class="notification-list-dropdown">
+                  <div class="notification-dropdown-header">Thông báo</div>
+                  <ul id="notification-list-items" class="notification-list">
+                      <li><a class="dropdown-item-notif">Không có thông báo nào.</a></li>
+                  </ul>
+                  <div class="notification-dropdown-footer">
+                      <a href="notifications.html" class="view-all-notifications">Xem tất cả</a>
+                  </div>
+              </div>
+          </li>
+
+          <li id="nav-login"><a href="login.html" class="nav-link">Đăng Nhập</a></li>
+          <li id="nav-register"><a href="register.html" class="nav-link">Đăng Ký</a></li>
         </ul>
       </div>
     </nav>
-  </header>
+</header>
 
   <!-- ===== MAIN CONTENT ===== -->
   <main class="container product-page">

@@ -48,28 +48,22 @@
                 </li>
 
                 <!-- 🔔 THÔNG BÁO -->
-                <li id="nav-notification-bell" style="display:none; position:relative;">
-                    <a href="#" class="nav-link nav-link-bell">
-                        <i class="fas fa-bell"></i>
-                        <span id="notification-count" class="notification-badge" style="display:none;"></span>
-                    </a>
+<li id="nav-notification-bell" style="display:none; position:relative;">
+    <a href="#" id="notification-bell-link" class="nav-link nav-link-bell" title="Thông báo">
+        <i class="fas fa-bell"></i>
+        <span id="notification-count" class="notification-badge" style="display:none;"></span>
+    </a>
 
-                    <div id="notification-dropdown" class="notification-list-dropdown">
-                        <div class="notification-dropdown-header">Thông báo</div>
-                        <ul id="notification-list-items" class="notification-list">
-                            <li><a class="dropdown-item-notif">Không có thông báo nào.</a></li>
-                        </ul>
-                        <div class="notification-dropdown-footer">
-                            <a href="notifications.html">Xem tất cả thông báo</a>
-                        </div>
-                    </div>
-                </li>
-
-                <!-- Login / Register / Logout -->
-                <li id="nav-login"><a href="login.html" class="nav-link">Đăng Nhập</a></li>
-                <li id="nav-register"><a href="register.html" class="nav-link">Đăng Ký</a></li>
-                <li id="nav-logout" style="display:none;"><a href="#" class="nav-link">Đăng Xuất</a></li>
-
+    <div id="notification-dropdown" class="notification-list-dropdown">
+        <div class="notification-dropdown-header">Thông báo</div>
+        <ul id="notification-list-items" class="notification-list">
+            <li><a class="dropdown-item-notif">Không có thông báo nào.</a></li>
+        </ul>
+        <div class="notification-dropdown-footer">
+            <a href="notifications.html" class="view-all-notifications">Xem tất cả thông báo</a>
+        </div>
+    </div>
+</li>
             </ul>
         </div>
     </nav>

@@ -58,40 +58,77 @@
         </section>
     </main>
 <!-- ⭐ ĐÁNH GIÁ SẢN PHẨM -->
-<div id="rating-summary-box" style="margin-top:40px;">
-    <h3>⭐ Đánh giá sản phẩm</h3>
+<section id="rating-summary-box" class="rating-section card">
+    <div class="rating-section-header">
+        <div>
+            <h3>Đánh giá sản phẩm</h3>
+            <p class="rating-section-subtitle">
+                Xem cảm nhận của những khách đã mua và chia sẻ ý kiến của bạn.
+            </p>
+        </div>
+        <!-- Nếu sau này có nút "Viết đánh giá" thì đặt ở đây -->
+        <div id="rating-actions-slot"></div>
+    </div>
 
     <!-- Trung bình số sao -->
-    <div id="rating-summary" style="margin-bottom:20px; font-size:18px; font-weight:600;">
+    <div id="rating-summary" class="rating-summary">
         Đang tải đánh giá...
     </div>
 
     <!-- Danh sách đánh giá -->
-    <div id="rating-list"></div>
-</div>
+    <div id="rating-list" class="rating-list"></div>
+</section>
+
     <footer>
         <div class="container">
             <p>&copy; <span id="current-year"></span> HyperBuy.</p>
         </div>
     </footer>
 <div id="sellerInfoModal" class="modal" style="display:none;">
-    <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-content seller-modal">
         <span class="close-button" onclick="closeSellerModal()" title="Đóng">&times;</span>
-        <h2>Thông Tin Cửa Hàng</h2>
-        <div id="seller-details-content">
-            <p><strong>Tên cửa hàng:</strong> <span id="modal-seller-store-name">N/A</span></p>
-            <p><strong>Chủ cửa hàng (Tên):</strong> <span id="modal-seller-owner-name">N/A</span></p>
-            <p><strong>Username:</strong> <span id="modal-seller-username">N/A</span></p>
-            <p><strong>GPKD:</strong> <span id="modal-seller-license">N/A</span></p>
+
+        <div class="seller-modal-header">
+            <div>
+                <h2>Thông tin cửa hàng</h2>
+                <p class="seller-modal-subtitle">
+                    Xem thông tin nhà bán và các sản phẩm khác của cửa hàng.
+                </p>
+            </div>
         </div>
-        </div>
-        <hr>
-        <h4>Sản phẩm của Cửa hàng</h4>
-        <div id="modal-seller-products" class="modal-products-grid">
-            <p>Đang tải sản phẩm của cửa hàng...</p>
+
+        <div class="seller-modal-body">
+            <!-- Thông tin chung -->
+            <div id="seller-details-content" class="seller-modal-info">
+                <div class="seller-info-row">
+                    <span class="label">Tên cửa hàng:</span>
+                    <span class="value" id="modal-seller-store-name">N/A</span>
+                </div>
+                <div class="seller-info-row">
+                    <span class="label">Chủ cửa hàng:</span>
+                    <span class="value" id="modal-seller-owner-name">N/A</span>
+                </div>
+                <div class="seller-info-row">
+                    <span class="label">Username:</span>
+                    <span class="value" id="modal-seller-username">N/A</span>
+                </div>
+                <div class="seller-info-row">
+                    <span class="label">GPKD:</span>
+                    <span class="value" id="modal-seller-license">N/A</span>
+                </div>
+            </div>
+
+            <!-- Danh sách sản phẩm của cửa hàng -->
+            <div class="seller-modal-products-wrapper">
+                <h4>Sản phẩm của cửa hàng</h4>
+                <div id="modal-seller-products" class="modal-products-grid">
+                    <p>Đang tải sản phẩm của cửa hàng...</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
     <script src="js/main.js"></script>
     <script>
 document.addEventListener("DOMContentLoaded", async () => {
