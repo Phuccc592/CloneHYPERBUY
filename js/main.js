@@ -2647,46 +2647,63 @@ async function loadMyOrders() {
 
     container.innerHTML = `<p class="text-muted">Đang tải đơn hàng...</p>`;
 
-    const res = await callApi(
-        ORDER_API_BASE_URL,
-        "/orders/my-orders",
-        "GET",
-        null,
-        true
-    );
+const res = await callApi(
+    ORDER_API_BASE_URL,
+    "/orders/my-orders",
+    "GET",
+    null,
+    true
+);
 
-    console.log("MY ORDERS response:", res);
+console.log("MY ORDERS response:", res);
 
-    if (!res.ok || !Array.isArray(res.data)) {
-        container.innerHTML =
-            `<p class="my-orders-empty">
-                Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.
-            </p>`;
-        return;
+if (!res.ok || !Array.isArray(res.data)) {
+    container.innerHTML =
+        `<p class="my-orders-empty">
+            Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.
+        </p>`;
+    return;
+}
+
+// ============================
+// ✅ SẮP XẾP: Đơn hàng mới nhất lên trên cùng
+// ============================
+const orders = [...res.data].sort((a, b) => {
+    const dateA = new Date(a.orderDate || a.createdAt || 0);
+    const dateB = new Date(b.orderDate || b.createdAt || 0);
+
+    // So sánh ngày trước
+    if (!isNaN(dateB - dateA) && (dateB - dateA) !== 0) {
+        return dateB - dateA; // mới hơn đứng trước
     }
 
-        const orders = res.data;
+    // Nếu ngày giống nhau -> so sánh ID giảm dần
+    return (Number(b.id) || 0) - (Number(a.id) || 0);
+});
+// ============================
 
-    if (orders.length === 0) {
-        container.innerHTML =
-            `<p class="my-orders-empty">
-                Bạn chưa có đơn hàng nào. 
-                <a href="products.html">Mua sắm ngay</a> nhé!
-            </p>`;
-        return;
-    }
+if (orders.length === 0) {
+    container.innerHTML =
+        `<p class="my-orders-empty">
+            Bạn chưa có đơn hàng nào. 
+            <a href="products.html">Mua sắm ngay</a> nhé!
+        </p>`;
+    return;
+}
 
-    function formatDate(isoString) {
-        if (!isoString) return "";
-        const d = new Date(isoString);
-        return d.toLocaleString("vi-VN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-    }
+// Hàm format ngày như cũ
+function formatDate(isoString) {
+    if (!isoString) return "";
+    const d = new Date(isoString);
+    return d.toLocaleString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 
     function getStatusBadge(status) {
         if (!status) {
@@ -4561,6 +4578,105 @@ async function loadVoucherList() {
         `;
     }
 }
+async function initEditAccountPage() {
+    const form = document.getElementById('edit-account-form');
+    const msgEl = document.getElementById('edit-account-message');
+
+    if (!form) return;
+
+    // Reset message
+    if (msgEl) {
+        msgEl.textContent = '';
+        msgEl.style.display = 'none';
+    }
+
+    if (!isLoggedIn()) {
+        if (msgEl) {
+            msgEl.textContent = 'Bạn cần đăng nhập để chỉnh sửa tài khoản.';
+            msgEl.className = 'error-message';
+            msgEl.style.display = 'block';
+        }
+        return;
+    }
+
+    // Lấy thông tin hiện tại để fill form
+    const user = await loadProfileData(); // đã có sẵn trong dự án
+    if (user) {
+        if (form.elements['name']) {
+            form.elements['name'].value = user.name || '';
+        }
+        if (form.elements['email']) {
+            form.elements['email'].value = user.email || '';
+        }
+        if (form.elements['dob']) {
+            // user.dob dạng ISO -> yyyy-MM-dd
+            const dobStr = user.dob ? String(user.dob).substring(0, 10) : '';
+            form.elements['dob'].value = dobStr;
+        }
+        // Nếu sau này BE có phone thì fill tương tự
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (msgEl) {
+            msgEl.textContent = '';
+            msgEl.style.display = 'none';
+        }
+
+        const userId = localStorage.getItem('currentUserId');
+        if (!userId) {
+            if (msgEl) {
+                msgEl.textContent = 'Không tìm thấy ID người dùng. Vui lòng đăng nhập lại.';
+                msgEl.className = 'error-message';
+                msgEl.style.display = 'block';
+            }
+            return;
+        }
+
+        const name = form.elements['name'].value.trim();
+        const email = form.elements['email'].value.trim();
+        const dob = form.elements['dob'].value; // yyyy-MM-dd
+        const newPassword = form.elements['password'].value.trim();
+
+        // Tạo payload đúng format Postman
+        const payload = {
+            name: name || null,
+            email: email || null,
+            dob: dob || null
+        };
+
+        if (newPassword) {
+            payload.password = newPassword;
+        }
+
+        const result = await callApi(
+            USER_API_BASE_URL,
+            `/users/${userId}`,
+            'PUT',
+            payload,
+            true // cần token
+        );
+
+        if (result.ok) {
+            if (msgEl) {
+                msgEl.textContent = '✅ Cập nhật tài khoản thành công!';
+                msgEl.className = 'success-message';
+                msgEl.style.display = 'block';
+            }
+            // cập nhật lại profile trong localStorage
+            await loadProfileData();
+        } else {
+            if (msgEl) {
+                msgEl.textContent =
+                    '❌ Lỗi: ' +
+                    (result.data?.message || result.error || 'Không thể cập nhật tài khoản.');
+                msgEl.className = 'error-message';
+                msgEl.style.display = 'block';
+            }
+        }
+    });
+}
 
 // =======================================================================================
 // START OF UPDATED DOMContentLoaded LISTENER
@@ -4717,6 +4833,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             sellerForm.addEventListener('submit', handleSellerRegistrationRequest); 
         }
         // Listener đóng modal khi click ra ngoài đã được xử lý ở global event listeners bên dưới.
+    }
+        else if (page === 'edit-account.html') {
+        await initEditAccountPage();
     }
     else if (page === 'products.html' && document.getElementById('product-grid-all')) {
         const filterForm = document.getElementById('filterForm');
