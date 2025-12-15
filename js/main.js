@@ -850,30 +850,28 @@ async function loadProducts(containerId, filters = {}) {
 
     // === Guest Recommendations ===
     async function fetchGuestRecommendations(limit = 12) {
-        try {
-            const result = await callApi(
-                PRODUCT_API_BASE_URL,
-                `/recommendations/guest?limit=${limit}`,
-                "GET",
-                null,
-                false   // ❗ Không dùng token
-            );
-
-            if (!result.ok || !result.data) return [];
-
-            // API trả về {code, message, result: []}
-            return result.data.result || [];
-        } catch (err) {
-            console.error("❌ Lỗi fetchGuestRecommendations:", err);
-            return [];
-        }
+    try {
+        const res = await callApi(
+        PRODUCT_API_BASE_URL,
+        `/recommendations/guest?limit=${limit}`,
+        "GET",
+        null,
+        false
+        );
+        if (!res.ok) return [];
+        return Array.isArray(res.data?.result) ? res.data.result : [];
+    } catch (err) {
+        console.error("❌ Lỗi fetchGuestRecommendations:", err);
+        return [];
     }
+    }
+
     function renderGuestRecommendations(products) {
         const container = document.getElementById("guest-recommend-products");
         if (!container) return;
 
         if (!products.length) {
-            container.innerHTML = "<p>Không có sản phẩm gợi ý.</p>";
+            container.innerHTML = "<p></p>";
             return;
         }
 
@@ -885,48 +883,151 @@ async function loadProducts(containerId, filters = {}) {
                 <a href="product-detail.html?id=${p.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
             </div>
         `).join("");
+        const cards = container.querySelectorAll(".product-card");
+        cards.forEach((card, i) => {
+        setTimeout(() => card.classList.add("card-show"), i * 30);});
     }
-// === User Recommendations (đã đăng nhập) ===
-async function fetchUserRecommendations(limit = 12) {
-    try {
-        const result = await callApi(
-            PRODUCT_API_BASE_URL,
-            `/recommendations/me?limit=${limit}`,
-            "GET",
-            null,
-            true  // ❗ ĐÃ ĐĂNG NHẬP -> gửi kèm token
-        );
+    // ✅ Render danh sách sản phẩm vào 1 grid bất kỳ theo containerId
+function renderProductsToGrid(containerId, products) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-        if (!result.ok || !result.data) return [];
+  if (!products || products.length === 0) {
+    container.innerHTML = "<p>Không có sản phẩm.</p>";
+    return;
+  }
 
-        // Backend trả { code, message, result: [...] }
-        return result.data.result || [];
-    } catch (err) {
-        console.error("❌ Lỗi fetchUserRecommendations:", err);
-        return [];
+  container.innerHTML = products.map(p => {
+    let img = "https://placehold.co/300x200?text=No+Image";
+    if (p.imageUrl) {
+      if (p.imageUrl.startsWith("http")) img = p.imageUrl;
+      else if (p.imageUrl.startsWith("/")) img = `http://localhost:8081${p.imageUrl}`;
+      else img = `http://localhost:8081/files/${p.imageUrl}`;
     }
+
+    return `
+      <div class="product-card">
+        <a href="product-detail.html?id=${p.id}">
+          <img src="${img}" alt="${p.name || "Sản phẩm"}"
+               onerror="this.onerror=null;this.src='https://placehold.co/300x200?text=Image+Error';">
+        </a>
+        <h4>${p.name || "Không tên"}</h4>
+        <p class="price">${Number(p.price || 0).toLocaleString("vi-VN")} đ</p>
+        <a href="product-detail.html?id=${p.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+      </div>
+    `;
+  }).join("");
+    const cards = container.querySelectorAll(".product-card");
+    cards.forEach((card, i) => {
+    setTimeout(() => card.classList.add("card-show"), i * 30);});
 }
-async function loadHomeRecommendations(limit = 12) {
-    const container = document.getElementById("guest-recommend-products");
+
+    // ✅ Render danh sách sản phẩm vào 1 grid bất kỳ theo containerId
+    function renderProductsToGrid(containerId, products) {
+    const container = document.getElementById(containerId);
     if (!container) return;
 
-    try {
-        let products = [];
-
-        if (isLoggedIn()) {
-            // ✅ Đã đăng nhập -> gọi API khuyến nghị cho user
-            products = await fetchUserRecommendations(limit);
-        } else {
-            // 👤 Chưa đăng nhập -> khuyến nghị guest
-            products = await fetchGuestRecommendations(limit);
-        }
-
-        renderGuestRecommendations(products);
-    } catch (err) {
-        console.error("❌ Lỗi loadHomeRecommendations:", err);
-        container.innerHTML = `<p class="error-message">Không thể tải danh sách gợi ý.</p>`;
+    if (!products || !products.length) {
+        container.innerHTML = "<p>Không có sản phẩm gợi ý.</p>";
+        return;
     }
+
+    container.innerHTML = products.map(p => `
+        <div class="product-card">
+        <img src="${PRODUCT_IMAGE_BASE_URL}${p.imageUrl}" alt="${p.name}">
+        <h4>${p.name}</h4>
+        <p class="price">${(p.price || 0).toLocaleString("vi-VN")} đ</p>
+        <a href="product-detail.html?id=${p.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+        </div>
+    `).join("");
+    }
+
+// === User Recommendations (đã đăng nhập) ===
+async function fetchUserRecommendations(limit = 12) {
+  try {
+    const res = await callApi(
+      PRODUCT_API_BASE_URL,
+      `/recommendations/me?limit=${limit}`,
+      "GET",
+      null,
+      true // cần token
+    );
+
+    if (!res.ok) return [];
+
+    // ✅ API của bạn trả { code, message, result: [] }
+    return Array.isArray(res.data?.result) ? res.data.result : [];
+  } catch (err) {
+    console.error("❌ Lỗi fetchUserRecommendations:", err);
+    return [];
+  }
 }
+
+// ================================
+// 🔁 FETCH SẢN PHẨM TƯƠNG TỰ
+// ================================
+async function fetchSimilarProducts(productId, limit = 10) {
+  try {
+    const res = await callApi(
+      PRODUCT_API_BASE_URL,
+      `/recommendations/similar/${productId}?limit=${limit}`,
+      "GET",
+      null,
+      false
+    );
+
+    if (!res.ok) return [];
+
+    // API trả { code, message, result: [] }
+    return Array.isArray(res.data?.result) ? res.data.result : [];
+  } catch (err) {
+    console.error("❌ Lỗi fetchSimilarProducts:", err);
+    return [];
+  }
+}
+
+// ================================
+// 📦 LOAD SẢN PHẨM TƯƠNG TỰ THEO URL
+// ================================
+async function loadSimilarProductsFromUrl(limit = 10) {
+  const grid = document.getElementById("similar-products-grid");
+  if (!grid) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get("id");
+
+  if (!productId) {
+    grid.innerHTML = "<p>Không xác định được sản phẩm.</p>";
+    return;
+  }
+
+  const products = await fetchSimilarProducts(productId, limit);
+
+  if (typeof renderProductsToGrid === "function") {
+    renderProductsToGrid("similar-products-grid", products);
+  } else {
+    grid.innerHTML = "<p>Lỗi hiển thị sản phẩm tương tự.</p>";
+  }
+}
+
+
+async function loadHomeRecommendations(limit = 12) {
+  // 1) Luôn load guest vào "Sản phẩm nổi bật"
+  const guest = await fetchGuestRecommendations(limit);
+  renderGuestRecommendations(guest);
+
+  // 2) Nếu login thì load thêm user vào "Đề xuất dành cho bạn"
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    const user = await fetchUserRecommendations(limit);
+    if (typeof renderProductsToGrid === "function") {
+      const sec = document.getElementById("user-recommend-section");
+      if (sec) sec.style.display = "block";
+      renderProductsToGrid("user-recommend-products", user);
+    }
+  }
+}
+
 // === Cart Management via API ===
 function updateCartUI(cartDataObject) {
     console.log("updateCartUI: Nhận được cartDataObject:", JSON.stringify(cartDataObject, null, 2));
@@ -1417,61 +1518,62 @@ async function loadProductDetail() {
 
     // --------- Thông tin seller + nút xem cửa hàng ----------
     let sellerInfoHtml = "";
-    if (sellerInfo && (sellerInfo.userId || sellerInfo.storeId)) {
-        const sellerDisplayName = sellerInfo.username || "N/A";
-        const sellerIdForButton = sellerInfo.userId;
+    if (sellerInfo && sellerInfo.userId) {
+    const sellerDisplayName = sellerInfo.username || "N/A";
+    const sellerIdForButton = sellerInfo.userId;
 
-        sellerInfoHtml = `
-            <div class="seller-info-section" style="margin-top: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
-                <p>Được bán bởi: <strong>${sellerDisplayName}</strong></p>
-                <button class="btn btn-secondary btn-sm btn-view-seller"
-                        data-seller-id="${sellerIdForButton}" 
-                        data-seller-username="${sellerInfo.username || ""}" 
-                        data-seller-store="${sellerInfo.storeId || ""}">
-                    Xem Chi Tiết Cửa Hàng
-                </button>
-            </div>`;
+    sellerInfoHtml = `
+        <div class="seller-info-section" style="margin-top: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
+        <p>Được bán bởi: <strong>${sellerDisplayName}</strong></p>
+
+        <a href="store.html?sellerId=${encodeURIComponent(sellerIdForButton)}"
+            class="btn btn-secondary btn-sm">
+            🏪 Xem Chi Tiết Cửa Hàng
+        </a>
+        </div>`;
     }
+// --------- Seller được phép quản lý sản phẩm? ----------
+let productManagementControls = "";
+const isSameSeller =
+    currentUserRole === "SELLER" &&
+    sellerInfo &&
+    sellerInfo.userId &&
+    currentUserId &&
+    sellerInfo.userId === currentUserId;
 
-    // --------- Seller được phép quản lý sản phẩm? ----------
-    let productManagementControls = "";
-    const isSameSeller =
-        currentUserRole === "SELLER" &&
-        sellerInfo &&
-        sellerInfo.userId &&
-        currentUserId &&
-        sellerInfo.userId === currentUserId;
+if (isSameSeller) {
+    const isActive = p.active !== false;
+    const statusText = isActive
+        ? `<span style="color:green;font-weight:bold;">Đang bán</span>`
+        : `<span style="color:orange;font-weight:bold;">Ngưng bán</span>`;
 
-    if (isSameSeller) {
-        const isActive = p.active !== false;
-        const statusText = isActive
-            ? `<span style="color:green;font-weight:bold;">Đang bán</span>`
-            : `<span style="color:orange;font-weight:bold;">Ngưng bán</span>`;
+    productManagementControls = `
+        <div class="seller-product-controls"
+             style="margin-top:20px;padding-top:15px;border-top:1px solid #ddd;">
+             
+            <h4>Quản lý sản phẩm của bạn</h4>
+            <p>Trạng thái: ${statusText}</p>
 
-        productManagementControls = `
-            <div class="seller-product-controls" style="margin-top:20px;padding-top:15px;border-top:1px solid #ddd;">
-                <h4>Quản lý sản phẩm của bạn</h4>
-                <p>Trạng thái: ${statusText}</p>
+            <a href="edit-product.html?id=${realProductId}" 
+               class="btn btn-info btn-sm" style="margin-right:8px;">
+                ✏️ Sửa sản phẩm
+            </a>
 
-                <a href="edit-product.html?id=${realProductId}" 
-                   class="btn btn-info btn-sm" style="margin-right:8px;">
-                    ✏️ Sửa sản phẩm
-                </a>
+            <button class="btn ${isActive ? "btn-warning" : "btn-success"} btn-sm seller-toggle-status"
+                    data-product-id="${realProductId}"
+                    data-store-id="${sellerInfo.storeId}">
+                ${isActive ? "⛔ Ngưng bán" : "🛒 Bán lại"}
+            </button>
 
-                <button class="btn ${
-                    isActive ? "btn-warning" : "btn-success"
-                } btn-sm seller-toggle-status"
-                        data-product-id="${realProductId}">
-                    ${isActive ? "⛔ Ngưng bán" : "🛒 Bán lại"}
-                </button>
+            <button class="btn btn-danger btn-sm seller-delete-product"
+                    data-product-id="${realProductId}"
+                    data-store-id="${sellerInfo.storeId}">
+                🗑️ Xóa sản phẩm
+            </button>
+        </div>
+    `;
+}
 
-                <button class="btn btn-danger btn-sm seller-delete-product"
-                        data-product-id="${realProductId}">
-                    🗑️ Xóa sản phẩm
-                </button>
-            </div>
-        `;
-    }
 
     // --------- Nút Thêm vào giỏ / Mua ngay ----------
     const productActionsHtml = p.active
@@ -1517,6 +1619,9 @@ async function loadProductDetail() {
             </div>
         </div>
     `;
+    requestAnimationFrame(() => {
+    contentEl.classList.add("detail-show");
+    });
 
     // --------- Gắn sự kiện seller (activate / deactivate / delete) ----------
     attachSellerProductEvents(realProductId);
@@ -1524,18 +1629,109 @@ async function loadProductDetail() {
     console.log("✅ Đã render xong product detail, init rating UI...");
     await initProductRatingUI(realProductId);
 }
-function attachSellerProductEvents(productId) {
-    // Ngưng bán / Bán lại
+async function loadStorePage() {
+  const storeId = new URLSearchParams(window.location.search).get("storeId");
+
+  const infoEl = document.getElementById("store-info");
+  const gridEl = document.getElementById("store-products-grid");
+
+  if (!storeId) {
+    if (infoEl) infoEl.innerHTML = `<div class="card"><p class="error-message">Thiếu storeId trên URL.</p></div>`;
+    if (gridEl) gridEl.innerHTML = `<p>Không có dữ liệu.</p>`;
+    return;
+  }
+
+  // 1) (Tuỳ chọn) Load thông tin store (nếu bạn có API)
+  // Nếu bạn chưa có API store thì giữ try/catch này để không crash.
+  if (infoEl) infoEl.innerHTML = `<div class="card"><p>Đang tải thông tin cửa hàng...</p></div>`;
+
+  try {
+    // 👉 Nếu bạn có endpoint store thật sự, sửa đúng baseURL/endpoint tại đây
+    // Ví dụ (tự chỉnh): const storeRes = await callApi(USER_API_BASE_URL, `/stores/${storeId}`, "GET", null, false);
+    // Tạm thời: bỏ qua nếu chưa có
+    if (infoEl) infoEl.innerHTML = `<div class="card"><p><b>Cửa hàng</b>: ${storeId}</p></div>`;
+  } catch (e) {
+    if (infoEl) infoEl.innerHTML = `<div class="card"><p class="error-message">Lỗi tải thông tin cửa hàng.</p></div>`;
+  }
+
+  // 2) Load sản phẩm của cửa hàng (quan trọng) ✅
+  if (gridEl) gridEl.innerHTML = `<p>Đang tải sản phẩm của cửa hàng...</p>`;
+
+  // ✅ Đây là chỗ bạn đang bị sai URL => phải là /products/store/{storeId}
+  const endpoint = `/products/store/${storeId}?page=0&size=12`;
+
+  const res = await callApi(PRODUCT_API_BASE_URL, endpoint, "GET", null, false);
+
+  if (!res.ok) {
+    console.log("STORE PRODUCTS ERROR:", res);
+    if (gridEl) gridEl.innerHTML = `<p class="error-message">Không tải được sản phẩm của cửa hàng (404 thường là sai endpoint).</p>`;
+    return;
+  }
+
+  // Hỗ trợ cả 2 kiểu response: result là array hoặc paging
+  const payload = res.data?.result ?? res.data;
+  const items =
+    Array.isArray(payload) ? payload :
+    Array.isArray(payload?.content) ? payload.content :
+    Array.isArray(payload?.items) ? payload.items :
+    [];
+
+  if (!items.length) {
+    if (gridEl) gridEl.innerHTML = `<p>Chưa có sản phẩm nào.</p>`;
+    return;
+  }
+
+  // Render
+  const toVND = (n) => (Number(n) || 0).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+
+  gridEl.innerHTML = items.map(p => {
+    const id = p.id;
+    const name = p.name || "Sản phẩm";
+    const price = toVND(p.price);
+
+    let img = p.imageUrl || "";
+    if (img.startsWith("http://productservice")) img = img.replace(/^http:\/\/productservice:\d+/, PRODUCT_IMAGE_BASE_URL);
+    else if (img.startsWith("http://localhost:8081")) img = img.replace("http://localhost:8081", PRODUCT_IMAGE_BASE_URL);
+    else if (img && !img.startsWith("http")) img = `${PRODUCT_IMAGE_BASE_URL}${img.startsWith("/") ? "" : "/"}${img}`;
+
+    if (!img) img = `https://placehold.co/400x300?text=${encodeURIComponent(name)}`;
+
+    return `
+      <div class="product-card">
+        <a href="product-detail.html?id=${id}" class="product-link">
+          <img class="product-image" src="${img}" alt="${name}">
+          <div class="product-info">
+            <h4 class="product-name">${name}</h4>
+            <div class="product-price">${price}</div>
+          </div>
+        </a>
+      </div>
+    `;
+  }).join("");
+}
+
+function attachSellerProductEvents() {
+
+    // Toggle active / deactivate
     document.querySelectorAll(".seller-toggle-status").forEach((btn) => {
         btn.addEventListener("click", async () => {
-            const isCurrentlyActive = btn.textContent.includes("Ngưng bán");
-            const confirmMsg = isCurrentlyActive
-                ? "Bạn có chắn chắn muốn NGƯNG BÁN sản phẩm này?"
+
+            const productId = btn.dataset.productId;
+            const storeId   = btn.dataset.storeId;
+
+            if (!productId || !storeId) {
+                alert("Thiếu productId hoặc storeId!");
+                return;
+            }
+
+            const isDeactivate = btn.textContent.includes("Ngưng bán");
+            const confirmMsg = isDeactivate
+                ? "Bạn có chắc muốn NGƯNG BÁN sản phẩm này?"
                 : "Bạn có muốn BÁN LẠI sản phẩm này?";
 
             if (!confirm(confirmMsg)) return;
 
-            const endpoint = isCurrentlyActive
+            const endpoint = isDeactivate
                 ? `/products/${productId}/deactivate`
                 : `/products/${productId}/activate`;
 
@@ -1544,7 +1740,9 @@ function attachSellerProductEvents(productId) {
                 endpoint,
                 "PATCH",
                 null,
-                true
+                true,
+                false,
+                { "X-Store-Id": storeId } // 🔥 QUAN TRỌNG
             );
 
             if (res.ok) {
@@ -1559,19 +1757,30 @@ function attachSellerProductEvents(productId) {
     // Xóa sản phẩm
     document.querySelectorAll(".seller-delete-product").forEach((btn) => {
         btn.addEventListener("click", async () => {
-            if (!confirm("Bạn có chắc chắn muốn XÓA sản phẩm này không?")) return;
+
+            const productId = btn.dataset.productId;
+            const storeId   = btn.dataset.storeId;
+
+            if (!productId || !storeId) {
+                alert("Thiếu productId hoặc storeId!");
+                return;
+            }
+
+            if (!confirm("Bạn có chắc chắn muốn XÓA VĨNH VIỄN sản phẩm này không?")) return;
 
             const res = await callApi(
                 PRODUCT_API_BASE_URL,
                 `/products/${productId}`,
                 "DELETE",
                 null,
-                true
+                true,
+                false,
+                { "X-Store-Id": storeId } // 🔥 QUAN TRỌNG
             );
 
-            if (res.ok) {
+            if (res.ok || res.status === 204) {
                 alert("Xóa sản phẩm thành công!");
-                window.location.href = "profile.html";
+                window.location.href = "products.html";
             } else {
                 alert("Lỗi xóa: " + (res.data?.message || res.error));
             }
@@ -2204,42 +2413,33 @@ async function handleUpdateProduct(event) {
         }
     }
 }
-async function handleDeactivateProduct(eventTarget) { // Nhận eventTarget (nút được bấm)
-    const productId = eventTarget.dataset.productId;
-    const storeId = eventTarget.dataset.storeId; // Lấy storeId từ data attribute của nút
+async function handleToggleProduct(btn) {
+    const productId = btn.dataset.productId;
+    const storeId = btn.dataset.storeId;
+    const isDeactivate = btn.textContent.includes("Ngưng");
 
-    const userRole = getUserRole();
-    if (!isLoggedIn() || (userRole !== 'ADMIN' && userRole !== 'SELLER')) {
-        alert("Bạn không có quyền thực hiện hành động này.");
-        return;
-    }
+    const endpoint = isDeactivate
+        ? `/products/${productId}/deactivate`
+        : `/products/${productId}/activate`;
 
-    // Backend yêu cầu X-Store-Id
-    if (!storeId) {
-        alert("Lỗi: Không tìm thấy thông tin cửa hàng (Store ID) để thực hiện hành động này trên sản phẩm.");
-        return;
-    }
-
-    if (!confirm('Bạn có chắc muốn NGƯNG BÁN sản phẩm này không? Sản phẩm sẽ không còn hiển thị cho khách hàng.')) {
-        return;
-    }
-
-    const headers = { 'X-Store-Id': storeId }; // Chuẩn bị header
-    // Body '1' có thể là yêu cầu của backend, giữ nguyên nếu đúng
-    const result = await callApi(PRODUCT_API_BASE_URL, `/products/${productId}/deactivate`, 'PATCH', '1', true, false, headers);
+    const result = await callApi(
+        PRODUCT_API_BASE_URL,
+        endpoint,
+        "PATCH",
+        null,
+        true,
+        false,
+        { "X-Store-Id": storeId }
+    );
 
     if (result.ok) {
-        alert('Đã chuyển sản phẩm sang trạng thái ngưng bán thành công!');
-        if (window.location.pathname.includes('product-detail.html')) {
-            loadProductDetail();
-        } else {
-            const currentGridId = getCurrentProductListContainerId();
-            if (currentGridId) loadProducts(currentGridId); else window.location.reload();
-        }
+        alert("Cập nhật trạng thái thành công!");
+        loadProductDetail();
     } else {
-        alert(`Lỗi khi ngưng bán sản phẩm: ${result.data?.message || result.error || `Lỗi server với status ${result.status}`}`);
+        alert("Thao tác thất bại!");
     }
 }
+
 
 
 
@@ -2280,36 +2480,39 @@ async function handleActivateProduct(eventTarget) { // Nhận eventTarget
         alert(`Lỗi khi kích hoạt sản phẩm: ${result.data?.message || result.error || `Lỗi server với status ${result.status}`}`);
     }
 }
-async function handleSellerDeleteProduct(eventTarget) { // Nhận eventTarget
+async function handleSellerDeleteProduct(eventTarget) {
     const productId = eventTarget.dataset.productId;
-    const storeId = eventTarget.dataset.storeId; // Lấy storeId từ data attribute
+    const storeId   = eventTarget.dataset.storeId;
 
-    const userRole = getUserRole();
-    if (!isLoggedIn() || userRole !== 'SELLER') { // Chỉ SELLER (chủ sở hữu, backend xác thực)
-        alert("Bạn không có quyền thực hiện hành động này.");
+    if (!productId || !storeId) {
+        alert("Thiếu productId hoặc storeId.");
         return;
     }
 
-    if (!storeId) {
-        alert("Lỗi: Không tìm thấy thông tin cửa hàng (Store ID) để thực hiện hành động này trên sản phẩm.");
-        return;
-    }
+    if (!confirm("XÓA VĨNH VIỄN sản phẩm này?")) return;
 
-    if (!confirm(`XÁC NHẬN XÓA VĨNH VIỄN sản phẩm này (ID: ${productId})?\n\nHành động này KHÔNG THỂ hoàn tác!`)) {
-        return;
-    }
+    const headers = {
+        "X-Store-Id": storeId
+    };
 
-    const headers = { 'X-Store-Id': storeId }; // Chuẩn bị header
-    // Đối với DELETE, body thường là null. Nếu backend của bạn yêu cầu body cụ thể, hãy điều chỉnh.
-    const result = await callApi(PRODUCT_API_BASE_URL, `/products/${productId}`, 'DELETE', null, true, false, headers);
+    const result = await callApi(
+        PRODUCT_API_BASE_URL,
+        `/products/${productId}`,
+        "DELETE",
+        null,      // ✅ DELETE không body
+        true,
+        false,
+        headers
+    );
 
     if (result.ok || result.status === 204) {
-        alert(`Sản phẩm (ID: ${productId}) của bạn đã được xóa vĩnh viễn thành công!`);
-        window.location.href = 'products.html'; // Hoặc trang quản lý sản phẩm của seller
+        alert("Xóa sản phẩm thành công!");
+        window.location.href = "products.html";
     } else {
-        alert(`Lỗi khi xóa sản phẩm: ${result.data?.message || result.error || `Lỗi server với status ${result.status}`}`);
+        alert(result.data?.message || "Xóa thất bại!");
     }
 }
+
 
 async function handleHardDeleteProduct(productId) {
     if (!isLoggedIn() || getUserRole() !== 'ADMIN') {
@@ -4904,6 +5107,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error("❌ Không tìm thấy productId trong URL!");
         }
     }
+    else if (page === 'store.html') {
+    await loadStorePage();
+    }
     else if (page === 'add-product.html') {
         if (isLoggedIn() && (getUserRole() === 'ADMIN' || getUserRole() === 'SELLER')) {
             // Đảm bảo loadCategoriesAndBuildMap đã chạy ở đầu
@@ -5571,5 +5777,34 @@ if (path.endsWith("minigame.html")) {
     console.log("🎮 Minigame page detected → initMinigamePage()");
     initMinigamePage();
 }
-
 });
+(function pageTransitionInit() {
+  // fade-in khi vào trang
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("page-enter");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => document.body.classList.remove("page-enter"));
+    });
+  });
+
+  // fade-out khi click link chuyển trang
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a");
+    if (!a) return;
+
+    const href = a.getAttribute("href");
+    if (!href || href.startsWith("#")) return;
+    if (a.target === "_blank") return;
+    if (href.startsWith("http")) return;
+
+    // cho phép ctrl / cmd / shift mở tab mới
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+    e.preventDefault();
+    document.body.classList.add("page-exit");
+
+    setTimeout(() => {
+      window.location.href = href;
+    }, 180);
+  });
+})();

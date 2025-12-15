@@ -24,7 +24,7 @@
         <ul id="main-nav" class="nav-links">
           <li><a href="index.html" id="nav-home" class="nav-link">Trang Chủ</a></li>
           <li><a href="products.html" id="nav-products" class="nav-link">Sản Phẩm</a></li>
-          
+
           <li id="nav-profile" style="display:none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
           <li id="nav-my-orders" style="display:none;"><a href="my-orders.html" class="nav-link nav-active">Đơn Hàng</a></li>
 
@@ -73,6 +73,14 @@
         <!-- 🔥 Khu vực hiển thị sản phẩm gợi ý AI (guest hoặc user) -->
         <div id="guest-recommend-products" class="product-grid"></div>
 
+        <!-- ⭐ ĐỀ XUẤT CHO BẠN (CHỈ KHI ĐĂNG NHẬP) -->
+        <section id="user-recommend-section" style="display:none; margin-top: 32px;">
+          <h3 style="margin-bottom:12px;">
+            <i class="fas fa-magic"></i> Đề xuất dành cho bạn
+          </h3>
+          <div id="user-recommend-products" class="product-grid"></div>
+        </section>
+
         <!-- Sản phẩm thường trên trang chủ -->
         <div class="product-grid" id="product-grid-home">
           <p>Đang tải sản phẩm...</p>
@@ -98,21 +106,28 @@
 
   <script src="js/main.js"></script>
   <script>
-    // Trang chủ: load khuyến nghị + sản phẩm + danh mục
     document.addEventListener("DOMContentLoaded", async () => {
       const token = localStorage.getItem("authToken");
 
-      // ===== 1. GỢI Ý SẢN PHẨM (AI) =====
-      // Hàm này đã dùng fetchUserRecommendations / fetchGuestRecommendations ở main.js
+      // ===== 1) NỔI BẬT (AI) =====
+      // Trong main.js: loadHomeRecommendations sẽ tự quyết định gọi guest/me tùy login
       await loadHomeRecommendations(12);
 
-      // ===== 2. SẢN PHẨM TRANG CHỦ (GRID BÊN DƯỚI) =====
+      // ===== 1.1) ĐỀ XUẤT CHO BẠN (CHỈ KHI LOGIN) =====
+      if (token) {
+        const userSection = document.getElementById("user-recommend-section");
+        if (userSection) userSection.style.display = "block";
+
+        const userRecs = await fetchUserRecommendations(12);
+        renderProductsToGrid("user-recommend-products", userRecs);
+      }
+
+      // ===== 2) GRID SẢN PHẨM THƯỜNG =====
       if (document.getElementById("product-grid-home")) {
-        // Hàm loadProducts đã có trong main.js
         loadProducts("product-grid-home", { size: 8 });
       }
 
-      // ===== 3. DANH MỤC BÊN PHẢI =====
+      // ===== 3) DANH MỤC BÊN PHẢI =====
       const ul = document.getElementById("right-category-list");
       try {
         const categoriesResult = await callApi(
@@ -120,7 +135,7 @@
           "/categories",
           "GET",
           null,
-          !!token   // true nếu có token, false nếu không
+          !!token
         );
 
         if (categoriesResult.ok && Array.isArray(categoriesResult.data)) {

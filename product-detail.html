@@ -1,144 +1,129 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Sản Phẩm - HyperBuy</title> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi Tiết Sản Phẩm - HyperBuy</title>
 
-    <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 <header>
-        <nav id="main-navbar">
-            <div class="container nav-container">
-                <a href="index.html" class="nav-brand">⚡ HyperBuy</a>
-                <ul id="main-nav" class="nav-links">
-                    <li><a href="index.html" id="nav-home" class="nav-link">Trang Chủ</a></li>
-                    <li><a href="products.html" id="nav-products" class="nav-link">Sản Phẩm</a></li>
-                    <li id="nav-profile" style="display: none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
-                    <li id="nav-my-orders" style="display: none;"><a href="my-orders.html" class="nav-link">Đơn Hàng</a></li>
-                     <a href="admin.html" id="nav-admin-dashboard" style="display:none;">Trang Quản Trị</a>
-                    <li id="nav-cart-link-li"><a href="cart.html" id="nav-cart-link" class="nav-link">Giỏ Hàng<span class="cart-item-count-nav" style="display: none;"></span></a></li>
-                    <li><a href="minigame.html" class="nav-link">MiniGame</a></li>
-                    <li class="nav-item nav-notification-container" id="nav-notification-bell" style="display: none; position: relative;">
-                        <a href="#" id="notification-bell-link" class="nav-link nav-link-bell" title="Thông báo">
-                            <i class="fas fa-bell"></i>
-                            <span id="notification-count" class="notification-badge" style="display: none;"></span>
-                        </a>
-                        <div class="dropdown-menu-notif notification-list-dropdown" id="notification-dropdown">
-                            <div class="notification-dropdown-header">Thông báo</div>
-                            <ul id="notification-list-items" class="notification-list">
-                                <li><a class="dropdown-item-notif" href="#">Không có thông báo nào.</a></li>
-                            </ul>
-                            <div class="notification-dropdown-footer">
-                                <a href="notifications.html" class="view-all-notifications">Xem tất cả thông báo</a>
-                            </div>
-                        </div>
-                    </li>
+  <nav id="main-navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">⚡ HyperBuy</a>
 
-                    <li id="nav-login"><a href="login.html" class="nav-link">Đăng Nhập</a></li>
-                    <li id="nav-register"><a href="register.html" class="nav-link">Đăng Ký</a></li>
-                    <li id="nav-logout" style="display: none;"><a href="#" class="nav-link">Đăng Xuất</a></li>
-                </ul>
-            </div>
-        </nav>
-        <div id="sidebar-overlay" style="display:none;"></div>
-    </header>
-<div id="sidebar-overlay" style="display:none;"></div>
+      <ul id="main-nav" class="nav-links">
+        <li><a href="index.html" id="nav-home" class="nav-link">Trang Chủ</a></li>
+        <li><a href="products.html" id="nav-products" class="nav-link">Sản Phẩm</a></li>
 
-    <main class="container">
-        <section id="product-detail-section">
-            <div id="product-detail-content">
-                <p>Đang tải thông tin sản phẩm...</p>
+        <li id="nav-profile" style="display:none;"><a href="profile.html" class="nav-link">Hồ Sơ</a></li>
+        <li id="nav-my-orders" style="display:none;"><a href="my-orders.html" class="nav-link">Đơn Hàng</a></li>
+
+        <li id="nav-cart-link-li">
+          <a href="cart.html" id="nav-cart-link" class="nav-link">
+            Giỏ Hàng <span class="cart-item-count-nav" style="display:none;"></span>
+          </a>
+        </li>
+
+        <li><a href="minigame.html" class="nav-link">MiniGame</a></li>
+
+        <li id="nav-admin-dashboard" style="display:none;">
+          <a href="admin.html" class="nav-link">Trang Quản Trị</a>
+        </li>
+
+        <li class="nav-item nav-notification-container"
+            id="nav-notification-bell"
+            style="display:none; position:relative;">
+          <a href="#" id="notification-bell-link" class="nav-link nav-link-bell" title="Thông báo">
+            <i class="fas fa-bell"></i>
+            <span id="notification-count" class="notification-badge" style="display:none;"></span>
+          </a>
+
+          <div class="dropdown-menu-notif notification-list-dropdown" id="notification-dropdown">
+            <div class="notification-dropdown-header">Thông báo</div>
+            <ul id="notification-list-items" class="notification-list">
+              <li><a class="dropdown-item-notif" href="#">Không có thông báo nào.</a></li>
+            </ul>
+            <div class="notification-dropdown-footer">
+              <a href="notifications.html" class="view-all-notifications">Xem tất cả thông báo</a>
             </div>
-        </section>
-    </main>
-<!-- ⭐ ĐÁNH GIÁ SẢN PHẨM -->
-<section id="rating-summary-box" class="rating-section card">
+          </div>
+        </li>
+
+        <li id="nav-login"><a href="login.html" class="nav-link">Đăng Nhập</a></li>
+        <li id="nav-register"><a href="register.html" class="nav-link">Đăng Ký</a></li>
+        <li id="nav-logout" style="display:none;"><a href="#" class="nav-link">Đăng Xuất</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ✅ chỉ để 1 overlay thôi -->
+  <div id="sidebar-overlay" style="display:none;"></div>
+</header>
+
+<main class="container">
+  <section id="product-detail-section">
+    <div id="product-detail-content">
+      <p>Đang tải thông tin sản phẩm...</p>
+    </div>
+  </section>
+
+  <!-- ⭐ ĐÁNH GIÁ SẢN PHẨM -->
+  <section id="rating-summary-box" class="rating-section card">
     <div class="rating-section-header">
-        <div>
-            <h3>Đánh giá sản phẩm</h3>
-            <p class="rating-section-subtitle">
-                Xem cảm nhận của những khách đã mua và chia sẻ ý kiến của bạn.
-            </p>
-        </div>
-        <!-- Nếu sau này có nút "Viết đánh giá" thì đặt ở đây -->
-        <div id="rating-actions-slot"></div>
+      <div>
+        <h3>Đánh giá sản phẩm</h3>
+        <p class="rating-section-subtitle">
+          Xem cảm nhận của những khách đã mua và chia sẻ ý kiến của bạn.
+        </p>
+      </div>
+      <div id="rating-actions-slot"></div>
     </div>
 
-    <!-- Trung bình số sao -->
-    <div id="rating-summary" class="rating-summary">
-        Đang tải đánh giá...
-    </div>
-
-    <!-- Danh sách đánh giá -->
+    <div id="rating-summary" class="rating-summary">Đang tải đánh giá...</div>
     <div id="rating-list" class="rating-list"></div>
-</section>
+  </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; <span id="current-year"></span> HyperBuy.</p>
-        </div>
-    </footer>
-<div id="sellerInfoModal" class="modal" style="display:none;">
-    <div class="modal-content seller-modal">
-        <span class="close-button" onclick="closeSellerModal()" title="Đóng">&times;</span>
-
-        <div class="seller-modal-header">
-            <div>
-                <h2>Thông tin cửa hàng</h2>
-                <p class="seller-modal-subtitle">
-                    Xem thông tin nhà bán và các sản phẩm khác của cửa hàng.
-                </p>
-            </div>
-        </div>
-
-        <div class="seller-modal-body">
-            <!-- Thông tin chung -->
-            <div id="seller-details-content" class="seller-modal-info">
-                <div class="seller-info-row">
-                    <span class="label">Tên cửa hàng:</span>
-                    <span class="value" id="modal-seller-store-name">N/A</span>
-                </div>
-                <div class="seller-info-row">
-                    <span class="label">Chủ cửa hàng:</span>
-                    <span class="value" id="modal-seller-owner-name">N/A</span>
-                </div>
-                <div class="seller-info-row">
-                    <span class="label">Username:</span>
-                    <span class="value" id="modal-seller-username">N/A</span>
-                </div>
-                <div class="seller-info-row">
-                    <span class="label">GPKD:</span>
-                    <span class="value" id="modal-seller-license">N/A</span>
-                </div>
-            </div>
-
-            <!-- Danh sách sản phẩm của cửa hàng -->
-            <div class="seller-modal-products-wrapper">
-                <h4>Sản phẩm của cửa hàng</h4>
-                <div id="modal-seller-products" class="modal-products-grid">
-                    <p>Đang tải sản phẩm của cửa hàng...</p>
-                </div>
-            </div>
-        </div>
+  <!-- SẢN PHẨM TƯƠNG TỰ -->
+  <section id="similar-products-section" class="card" style="margin-top:24px;">
+    <h3 style="margin-bottom:12px;">
+      <i class="fas fa-clone"></i> Sản phẩm tương tự
+    </h3>
+    <div id="similar-products-grid" class="product-grid">
+      <p>Đang tải sản phẩm tương tự...</p>
     </div>
-</div>
+  </section>
+</main>
 
-    <script src="js/main.js"></script>
-    <script>
-document.addEventListener("DOMContentLoaded", async () => {
+<footer>
+  <div class="container">
+    <p>&copy; <span id="current-year"></span> HyperBuy.</p>
+  </div>
+</footer>
 
-    await loadProfileData();        // ⭐ Lấy role + userId từ token
-    await fetchAndStoreMyStoreId(); // ⭐ Lấy store của seller
-    updateNav();                    // ⭐ Hiển thị các mục SELLER
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    await loadProfileData();
+    await fetchAndStoreMyStoreId();
+    updateNav();
 
-    loadProductDetail();            // ⭐ Load chi tiết sản phẩm + Hiện nút sửa/ngưng bán/xóa
-});
+    await loadProductDetail();          // ✅ nên await để chắc chắn render xong
+    loadSimilarProductsFromUrl(10);
+  });
 </script>
+
 </body>
 </html>
